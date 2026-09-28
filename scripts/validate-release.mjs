@@ -42,6 +42,7 @@ export async function validateRelease(tarball, tag, root = repository) {
     throw new Error("Unexpectedly large release archive");
   const { stdout } = await execute("tar", ["-tzf", tarball], { maxBuffer: 8_000_000 });
   const files = stdout
+    .replace(/\r/g, "")
     .trim()
     .split("\n")
     .filter((name) => !name.endsWith("/"));

@@ -95,6 +95,96 @@ async function main() {
       }
       return;
     }
+    case "diagnose": {
+      const credentials = await loadCredentials();
+      const { diagnoseFailure, createEvaluator, createEvaluationCache } = await import("@repo/core");
+      const { renderDiagnostic } = await import("./render-diagnostic");
+      const cache = createEvaluationCache({
+        directory: cacheDirectory(),
+        enabled: !command.noCache,
+      });
+      const evaluator = createEvaluator({
+        cache,
+        concurrency: command.concurrency,
+        policyVersion: JSON.stringify(command.policy),
+        ...credentials,
+        signal: controller.signal,
+      });
+      const result = await diagnoseFailure(
+        {
+          trace: command.trace,
+          root: command.root,
+          policy: command.policy,
+          signal: controller.signal,
+        },
+        evaluator,
+      );
+      if (pipeClosed) return;
+      await write(renderDiagnostic(result));
+      process.exitCode = result.status === "no_candidates" ? 1 : 0;
+      return;
+    }
+    case "impact": {
+      const credentials = await loadCredentials();
+      const { analyzeImpact, createEvaluator, createEvaluationCache } = await import("@repo/core");
+      const { renderImpact } = await import("./render-impact");
+      const cache = createEvaluationCache({
+        directory: cacheDirectory(),
+        enabled: !command.noCache,
+      });
+      const evaluator = createEvaluator({
+        cache,
+        concurrency: command.concurrency,
+        policyVersion: JSON.stringify(command.policy),
+        ...credentials,
+        signal: controller.signal,
+      });
+      const result = await analyzeImpact(
+        {
+          symbol: command.symbol,
+          root: command.root,
+          description: command.description,
+          targetPath: command.targetPath,
+          policy: command.policy,
+          signal: controller.signal,
+        },
+        evaluator,
+      );
+      if (pipeClosed) return;
+      await write(renderImpact(result));
+      process.exitCode = result.status === "no_callers" ? 1 : 0;
+      return;
+    }
+    case "guard": {
+      const credentials = await loadCredentials();
+      const { auditGuard, createEvaluator, createEvaluationCache } = await import("@repo/core");
+      const { renderGuard } = await import("./render-guard");
+      const cache = createEvaluationCache({
+        directory: cacheDirectory(),
+        enabled: !command.noCache,
+      });
+      const evaluator = createEvaluator({
+        cache,
+        concurrency: command.concurrency,
+        policyVersion: JSON.stringify(command.policy),
+        ...credentials,
+        signal: controller.signal,
+      });
+      const result = await auditGuard(
+        {
+          root: command.root,
+          threshold: command.threshold,
+          targetFiles: command.files,
+          policy: command.policy,
+          signal: controller.signal,
+        },
+        evaluator,
+      );
+      if (pipeClosed) return;
+      await write(renderGuard(result));
+      process.exitCode = result.criticalCount > 0 ? 2 : 0;
+      return;
+    }
     case "search": {
       const credentials = await loadCredentials();
       const { retrieve, createEvaluator, createEvaluationCache } = await import("@repo/core");

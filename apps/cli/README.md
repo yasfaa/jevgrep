@@ -4,7 +4,7 @@ Ask a repository question and get relevant file locations plus verbatim source
 excerpts. Jevgrep helps a coding agent begin unfamiliar multi-file work with
 useful context; the agent still owns implementation and verification.
 
-Requires Node.js 22 or newer on macOS or Linux. Install and authenticate:
+Requires Node.js 22 or newer on macOS, Linux, or Windows. Install and authenticate:
 
 ```sh
 npm install --global @dzhng/jevgrep
@@ -12,6 +12,13 @@ jg auth
 jg doctor
 jg "How are telemetry events recorded and sent?" ./my-project
 ```
+
+## Commands
+
+- `jg "question" [root]`: Semantic codebase search and source retrieval.
+- `jg diagnose "stack trace" [root]`: Pinpoint root causes of crashes/errors across stack frames (Node.js, Python, PHP/Laravel).
+- `jg impact "symbol" [root] [--description "..."]`: Predict breaking change risk & semantic blast radius across callers.
+- `jg guard [root] [--threshold 0.7] [--file "..."]`: Audit code against security leaks, SQL/shell injections, and architectural boundary violations.
 
 `auth` asks you to choose a provider, then saves its key in an owner-only config file.
 Run `jg --help` for the supported provider names. Searches use that provider until you run auth again.

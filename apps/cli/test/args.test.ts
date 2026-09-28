@@ -79,3 +79,33 @@ test("concurrency is a positive search-only limit and does not change cache poli
   for (const args of [["doctor"], ["auth"], ["skill"], ["cache", "clear"]])
     expect(() => parseCommand([...args, "--concurrency", "2"])).toThrow();
 });
+
+test("diagnose, impact, and guard commands parse valid arguments and flags", () => {
+  // diagnose
+  expect(parseCommand(["diagnose", "TypeError: foo", "my-root"])).toMatchObject({
+    kind: "diagnose",
+    trace: "TypeError: foo",
+    root: "my-root",
+  });
+  expect(() => parseCommand(["diagnose"])).toThrow();
+
+  // impact
+  expect(parseCommand(["impact", "MyFunc", "./src", "--description", "changed api"])).toMatchObject({
+    kind: "impact",
+    symbol: "MyFunc",
+    root: "./src",
+    description: "changed api",
+  });
+  expect(() => parseCommand(["impact"])).toThrow();
+
+  // guard
+  expect(parseCommand(["guard", "./src", "--threshold", "0.8", "--file", "auth.ts"])).toMatchObject({
+    kind: "guard",
+    root: "./src",
+    threshold: 0.8,
+    files: ["auth.ts"],
+  });
+  expect(parseCommand(["guard", "--help"])).toEqual({ kind: "help" });
+  expect(parseCommand(["diagnose", "--help"])).toEqual({ kind: "help" });
+});
+

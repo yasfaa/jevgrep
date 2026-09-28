@@ -11,9 +11,9 @@ export async function bundledNotices(metafile, root) {
   let needsApacheTerms = false;
   for (const output of Object.values(metafile.outputs)) {
     for (const [input, contribution] of Object.entries(output.inputs)) {
-      if (!contribution.bytesInOutput || !input.split("/").includes("node_modules")) continue;
+      if (!contribution.bytesInOutput || !input.split(/[/\\]/).includes("node_modules")) continue;
       let directory = dirname(resolve(root, input));
-      while (directory.split("/").includes("node_modules")) {
+      while (directory.split(/[/\\]/).includes("node_modules")) {
         let metadata;
         try {
           metadata = JSON.parse(await readFile(resolve(directory, "package.json"), "utf8"));
@@ -56,7 +56,7 @@ export async function bundledNotices(metafile, root) {
         }
         directory = dirname(directory);
       }
-      if (!directory.split("/").includes("node_modules"))
+      if (!directory.split(/[/\\]/).includes("node_modules"))
         throw new Error(`No package metadata for bundled input ${input}`);
     }
   }

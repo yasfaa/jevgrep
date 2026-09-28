@@ -17,6 +17,7 @@ export async function installSkill(
       stdio: ["inherit", process.stdout, process.stdout],
       signal,
       killSignal: "SIGINT",
+      shell: process.platform === "win32",
     });
     child.once("error", (error: NodeJS.ErrnoException) =>
       reject(

@@ -9,14 +9,14 @@
 
 **Same intelligence. ~30% lower cost.**
 
-Find code by asking what it does. In our ten-task SWE-bench comparison, Jevgrep
-successfully completed the same 8 of 10 tasks as the baseline, at lower cost.
+`jevgrep` (`jg`) is a **Semantic Code Intelligence Suite** and fast source retriever built for AI coding agents and developers. Powered by TypeSafe's calibrated System One model [Jev](https://vercel.com/ai-gateway/models/jev), `jg` turns natural-language questions, stack traces, and symbol names into precise, high-confidence source context and calibrated probabilistic judgments.
 
-Coding agents spend part of every unfamiliar task finding the right files.
-Jevgrep gives them a place to start: ask a repository question, and `jg` returns
-relevant files, reading leads, and verbatim source excerpts in one stdout response.
-It uses [Jev](https://vercel.com/ai-gateway/models/jev) to judge relevance across
-folders, files, and declarations. Your coding agent then implements and tests the change.
+| Command | Capability | Typical Use Case |
+| :--- | :--- | :--- |
+| **`jg "question"`** | **Semantic Code Search** | Unfamiliar codebase exploration & source retrieval |
+| **`jg diagnose`** | **Root-Cause Bug Locator** | Pinpoint culprit declarations from stack traces (Node, Python, PHP, Laravel) |
+| **`jg impact`** | **Semantic Blast Radius** | Predict breaking changes & contract compatibility across callers |
+| **`jg guard`** | **Security & Policy Guard** | Audit credential leaks, injection risks & architecture violations |
 
 ```sh
 npm install -g @dzhng/jevgrep
@@ -25,11 +25,8 @@ jg skill
 jg "How are telemetry events recorded and sent?" ./my-project
 ```
 
-Requires **Node.js 22+**, **macOS or Linux**, and a key for **Vercel AI Gateway, TypeSafe, OpenRouter, or OpenCode Zen**.
+Requires **Node.js 22+**, **Windows, macOS, or Linux**, and an API key for **OpenRouter, TypeSafe, Vercel AI Gateway, or OpenCode Zen**.
 No separate Python, Bun, or ripgrep installation is required to use `jg`.
-
-Provider selection requires **0.3.0 or newer**. Upgrade an older installation with
-`npm install --global @dzhng/jevgrep@latest`.
 
 ## Install the agent skill — required for agent setup
 
@@ -95,6 +92,41 @@ not a generated answer or a guarantee that every relevant file was found.
 
 When you already know an exact symbol or path, a direct read or `rg` search may be
 all you need. Jevgrep is most useful for questions that span unfamiliar files.
+
+## Semantic Code Intelligence Suite
+
+Beyond exploratory search, `jg` provides dedicated primitives for debugging, refactoring, and quality gates:
+
+### Diagnose: Root-Cause Bug Locator
+
+Pass a stack trace, test error, or crash log (supports Python, Node.js V8, PHP, and Laravel Ignition):
+
+```sh
+jg diagnose "TypeError: Cannot read properties of undefined at parseCommand (args.ts:45:12)" .
+```
+
+`jg diagnose` parses frames across your repository, extracts surrounding declarations, and evaluates calibrated probabilities distinguishing the root-cause bug from downstream secondary symptoms.
+
+### Impact: Semantic Blast Radius Analyzer
+
+Assess risks and breaking changes before modifying a shared function, class, or contract:
+
+```sh
+jg impact "parseCommand" . --description "Changing argument order and adding required fields"
+```
+
+Finds all callers and consumers across the codebase and predicts breaking change probability, behavioral divergence, and backward compatibility.
+
+### Guard: Semantic Architecture & Security Audit
+
+Run calibrated policy checks against code to detect vulnerabilities and architectural leaks:
+
+```sh
+jg guard . --threshold 0.70
+jg guard . --file "apps/api/src/routes/auth.ts"
+```
+
+Audits against credential leakage, unsanitized query/command injection, architectural layer boundary violations, and silent error swallows. Exits with code `2` if violations are found, making it ideal for CI/CD gates and pre-commit checks.
 
 ## What we measured
 
